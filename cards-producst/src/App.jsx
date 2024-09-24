@@ -1,31 +1,45 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import reactLogo from './assets/react.svg'
 import ProductCard from './components/ProductCard'
-import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
 
-  const productData = () => {
-    const [data, setData] = useState(null)
-    const [loading, setLoading] = useState(null)
-    const [error, setError] = useState(null)
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-    useEffect(() => {
-      axios 
-      .get("")
+  useEffect(() => {
+
+    const api_key = "F2s1LfUMqP6fY5FwsaRKOEwRKCkdMiuIKGR9Np80"
+
+    axios.get("/dev/api/products", {
+      headers: {
+        'X-Api-Key': api_key
+      },
+    }).then((response) => {
+      setProduct(response.data)
+      setLoading(false)
+    }).catch((error) => {
+      setError(error.message)
+      setLoading(false)
     })
-  }
+  }, [])
+  
+  
+  if (loading) return <div>Cargando... </div>
+  
+  if (error) return <div>Error: {error}</div>
+  
+  console.log(product)
 
   return (
     <>
       <div className="App">
-        <ProductCard product={productData} />
+        {product && product.map((p, index) => <ProductCard product={p} key={index}/>)}
       </div>
     </>
   )
 }
-
+  
 export default App

@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types'
 import './ProductCard.css'; // Puedes agregar estilos personalizados aquí
 
 const ProductCard = ({ product }) => {
@@ -19,6 +19,25 @@ const ProductCard = ({ product }) => {
       </div>
     </div>
   );
+};
+
+// Validar las props usando PropTypes
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    brand: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    sku: PropTypes.string.isRequired,
+    variant: PropTypes.string,
+    externalBarcode: PropTypes.string,
+    internalCode: PropTypes.string,
+    active: PropTypes.bool.isRequired,
+    images: PropTypes.shape({
+      large: PropTypes.string.isRequired,
+      medium: PropTypes.string,
+      small: PropTypes.string,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default ProductCard;
