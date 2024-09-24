@@ -1,25 +1,21 @@
-const express = require('express')
-const cors = require('cors')
-const axios = require('axios')
-const crypto = require('node:crypto')// ! crear ids
-const movies = require('./movies.json')
-const { validateMovie } = require('./schemas/movies')
+import express, { json } from 'express'
+import cors from 'cors'
+import axios from 'axios'
+import { MELON_URL, API_KEY_MELON, URL_ZOHO_PRODUCTS } from './config.js'
 
 const app = express()
 
-app.use(express.json())
+app.use(json())
 
 app.disable('x-powered-by')
 
 // ? se traen los productos desde la melonn api
-app.get('/products', async (req, res) => {
+app.get('/inventory', async (req, res) => {
   try {
-    res.header('Access-Control-Allow-Origin', '*')
-    const apiKey = 'F2s1LfUMqP6fY5FwsaRKOEwRKCkdMiuIKGR9Np80'
-
-    const response = await axios.get('https://kb5jdl3lek.execute-api.us-east-1.amazonaws.com/dev/api/products', {
+    const response = await axios.get(`${MELON_URL}/logistics/inventory`, {
       headers: {
-        'X-Api-Key': apiKey
+        'Access-Control-Allow-Origin': '*',
+        'X-Api-Key': API_KEY_MELON
       }
     })
 
@@ -31,41 +27,18 @@ app.get('/products', async (req, res) => {
   }
 })
 
-// ? todos los recursos que sean MOVIES se identifican con /movies
-app.get('/movies', (req, res) => {
-  const { genre } = req.query
-  if (genre) {
-    const filteredMovies = movies.filter(
-      movie => movie.genre.some(g => g.toLowerCase() === genre.toLowerCase())
-    )
-    return res.json(filteredMovies)
+app.get('/zohoProducts', async (req, res) => {
+  try {
+    const response = await axios.get(URL_ZOHO_PRODUCTS)
+    res.json(response.data)
+  } catch (error) {
+    console.error('error al hacer la peticion', error)
+    res.status(500).json({ message: 'error al obtener los datos del producto' })
   }
-  res.json(movies)
 })
 
-app.get('/movies/:id', (req, res) => { // ? path-to-regexp
-  const { id } = req.params
-  const movie = movies.find(movie => movie.id === id)
-  if (movie) return res.json(movie)
-
-  res.status(404).json({ message: 'Movie not found' })
-})
-
-app.post('/movies', (req, res) => {
-  const result = validateMovie(req.body)
-
-  if (result.error) {
-    return res.status(400).json({ error: result.error.message })
-  }
-
-  const newMovie = {
-    id: crypto.randomUUID(), // uuid v4
-    ...result.data
-  }
-
-  movies.push(newMovie)
-
-  res.status(201).json(newMovie)
+app.get('/', (req, res) => {
+  res.json({ message: 'hola mundo' })
 })
 
 const PORT = process.env.PORT ?? 1234
