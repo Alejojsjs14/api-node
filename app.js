@@ -1,4 +1,6 @@
 const express = require('express')
+const cors = require('cors')
+const axios = require('axios')
 const crypto = require('node:crypto')// ! crear ids
 const movies = require('./movies.json')
 const { validateMovie } = require('./schemas/movies')
@@ -8,6 +10,26 @@ const app = express()
 app.use(express.json())
 
 app.disable('x-powered-by')
+
+// ? se traen los productos desde la melonn api
+app.get('/products', async (req, res) => {
+  try {
+    res.header('Access-Control-Allow-Origin', '*')
+    const apiKey = 'F2s1LfUMqP6fY5FwsaRKOEwRKCkdMiuIKGR9Np80'
+
+    const response = await axios.get('https://kb5jdl3lek.execute-api.us-east-1.amazonaws.com/dev/api/products', {
+      headers: {
+        'X-Api-Key': apiKey
+      }
+    })
+
+    res.json(response.data)
+  } catch (error) {
+    console.error('error al hacer la peticion: ', error)
+
+    res.status(500).json({ message: 'error al obtener los datos del producto' })
+  }
+})
 
 // ? todos los recursos que sean MOVIES se identifican con /movies
 app.get('/movies', (req, res) => {
@@ -47,6 +69,9 @@ app.post('/movies', (req, res) => {
 })
 
 const PORT = process.env.PORT ?? 1234
+
+// ? se habilita el cors para el front
+app.use(cors({ origin: 'http://localhost:3000' }))
 
 app.listen(PORT, () => {
   console.log(`server listening on port http://localhost:${PORT}`)

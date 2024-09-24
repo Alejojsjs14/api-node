@@ -23,5 +23,4 @@ Content-Type: application/json
 }
 
 ###productos de lo otro
-GET https://kb5jdl3lek.execute-api.us-east-1.amazonaws.com/dev/api/products
-X-Api-Key: F2s1LfUMqP6fY5FwsaRKOEwRKCkdMiuIKGR9Np80
+GET https://localhost:1234/products
