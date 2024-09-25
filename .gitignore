@@ -1,7 +1,4 @@
 #ignore node modules
 node_modules/
-
-#old js
-/part_2/
-
+/cards-producst/
 
